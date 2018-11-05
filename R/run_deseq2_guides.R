@@ -1,17 +1,16 @@
-#' A function to calculate DESeq2 log-fold changes for sgRNA counts from poole CRISPR screens
+#' A function to calculate DESeq2 log-fold changes for sgRNA counts from pooled CRISPR screens. Returns a table of DEseq2
+#' log-fold changes.
 #'
 #' This function takes as input a table containing the gRNA sequences and will output a .fasta and a .gtf file \
 #' containing the merged plasmid + gRNA sequences and the gtf description to add them to a reference genome.
-#' @param design_matrix
-#' @param sgRNA_count_table
-#' @param design_column
+#' @param design_matrix Matrix containing the experimental design that is used to perform estimation of DE genes
+#' @param sgRNA_count_table Table containing non-normalized sgRNA counts. Can be produced with MAGECK count.
 #' @export
 #' @examples
 #' run_deseq2_on_guides()
 
 run_deseq2_guides <- function(design_matrix,
-                                 sgRNA_count_table,
-                                 design_column = "distribution")
+                                 sgRNA_count_table)
   {
 
   ## Specify required libraries
@@ -41,7 +40,8 @@ run_deseq2_guides <- function(design_matrix,
   ## Create DEseq2 object
   dds <- DESeqDataSetFromMatrix(countData = counts_filtered,
                                 colData = design,
-                                design = ~ design_column)
+                                design = ~ distribution)
+
 
   dds$distribution <- factor(dds$distribution, levels = c("BOTTOM","TOP"))
 
