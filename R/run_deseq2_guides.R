@@ -2,7 +2,9 @@
 #'
 #' This function takes as input a table containing the gRNA sequences and will output a .fasta and a .gtf file \
 #' containing the merged plasmid + gRNA sequences and the gtf description to add them to a reference genome.
-#' @param sgRNA_table The table containing the sgRNA sequences and annotation.
+#' @param design_matrix
+#' @param sgRNA_count_table
+#' @param design_column
 #' @export
 #' @examples
 #' run_deseq2_on_guides()
