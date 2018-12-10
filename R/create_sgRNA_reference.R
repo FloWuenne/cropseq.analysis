@@ -19,13 +19,22 @@ create_sgRNA_reference <- function(sgRNA_table,
                                    outdir = ".")
   {
   ## Create outfile names
-  fasta_out = paste(outdir,"/cropseq_guides.fasta",sep="")
-  gtf_out = paste(outdir,"/cropseq_guides.gtf" ,sep="")
+  fasta_out = paste(outdir,"/cropseq_guides.",assay,".fasta",sep="")
+  gtf_out = paste(outdir,"/cropseq_guides.",assay,".gtf" ,sep="")
 
   ## Store the plasmid sequences that will be assembled with the guide
   upstream_sequence <- toupper("gagggcctatttcccatgattccttcatatttgcatatacgatacaaggctgttagagagataattagaattaatttgactgtaaacacaaagatattagtacaaaatacgtgacgtagaaagtaataatttcttgggtagtttgcagttttaaaattatgttttaaaatggactatcatatgcttaccgtaacttgaaagtatttcgatttcttggctttatatatcttgtggaaaggacgaaacaccg")
   downstream_sequence_original <- toupper("gttttagagctagaaatagcaagttaaaataaggctagtccgttatcaacttgaaaaagtggcaccgagtcggtgcttttttaagcttggcgtaactagatcttgagacactgctttttgcttgtactgggtctctctggttagaccagatctgagcctgggagctctctggctaactagggaacccactgcttaagcctcaataaagcttgccttgagtgcttcaagtagtgtgtgcccgtctgttgtgtgactctggt")
   downstream_sequence_MS2 <- toupper("GTTTTAGAGCTAGGCCAACATGAGGATCACCCATGTCTGCAGGGCCTAGCAAGTTAAAATAAGGCTAGTCCGTTATCAACTTGGCCAACATGAGGATCACCCATGTCTGCAGGGCCAAGTGGCACCGAGTCGGTGCTTTTTTTAAGCTTGGCGTAACTAGATCTTGAGACACTGCTTTTTGCTTGTACTGGGTCTCTCTGGTTAGACCAGATCTGAGCCTGGGAGCTCTCTGGCTAACTAGGGAACCCACTGCTTAAGCCTCAATAAAGCTTGCCTTGAGTGCTTCAAGTAGTGTGTGCCCGTCTGTTGTGTGACTCTGGTAACTAGAGATCCCTCAGACCCTTTTAGTCAGTGTGGAAAATCTCTAGCAGTACGTATAGT")
+
+  ## Check if fasta and gtf exist and if yes, delete them
+  if(file.exists(fasta_out)){
+    file.remove(fasta_out)
+  }
+
+  if(file.exists(gtf_out)){
+    file.remove(gtf_out)
+  }
 
   # Iterate over all entries in the sgRNA table
   for(entry in 1:nrow(sgRNA_table)){
@@ -33,7 +42,6 @@ create_sgRNA_reference <- function(sgRNA_table,
     print(entry)
 
     ## Create a fasta record
-
     chrom <- paste(sgRNA_table[entry,]$name,"_chrom",sep="")
 
     ## Check if assay has been set to activation
@@ -43,7 +51,7 @@ create_sgRNA_reference <- function(sgRNA_table,
                      downstream_sequence_MS2,
                      sep="")
       header <- paste(">",chrom," length=",nchar(assembled_gRNA)," assay=activation",sep="")
-    } else {
+    } else if (assay == "inhibition") {
       assembled_gRNA <- paste(upstream_sequence,
                      sgRNA_table[entry,]$gRNA_sequence,
                      downstream_sequence_original,
@@ -115,7 +123,7 @@ create_sgRNA_reference <- function(sgRNA_table,
     entry_transcript <- paste(chrom,source,"transcript","1",length,".",strand,".",transcript_annotation,sep="\t")
     entry_exon <- paste(chrom,source,"exon","1",length,".",strand,".",exon_annotation,sep="\t")
 
-    ## Check if fasta file exists, if it does, make a new one
+    ## Check if gtf file exists, if it does, make a new one
     write(entry_gene,file=gtf_out,append=TRUE)
     write(entry_transcript,file=gtf_out,append=TRUE)
     write(entry_exon,file=gtf_out,append=TRUE)
